@@ -2,5 +2,6 @@
     "gogoanime_main":"https://anitaku.to",
     "downloads":"./downloads",
     "captcha_v3":"03AFcWeA4hhxkRZ-imhkhY5yvROiNRNPXzd--2yTHHe6VIQHgwfD3gV8Zu8qB4xgBSdkA-Af3MQqJr6h5GobRaYhONsCl935xiCj10JsFtKbrpSRHqrMuLGw_tdeLp8XMvTFaOWIXy0NG_X_GNYFwQBkg5bSF7ZYTn80u1joMu5V96HaeYU0SSa5vD4hWIBKnQGy5LDinPhUvKGSphTP79yGVjohvnurdF_gpQl34JHSf2n30br4vRMHS5K57JjGrzG6TxaH_pPAstgcK0YMTvic2hlGZnoB7v9zfSsCQIO7xoSydU3hMkIkWgFAoQaL_7EG7WQ-JWJ98tqGREEepmGwrxNi0JfBvIiry7lm473b35qLAt4oaTWaJLDCVkTHO4wivj4cpUs0sCfGV0gmMUxqLgIJFAW_HFcp4oTlcZQgNV89vYHuFhP3fpyHlhPte2K0g60SpD9PjLjirc-ftEz5CmcUHssfdzROUrnV2dyLiMJGCuslMaopqCzDfaIQpwmzuN5nQCWsTvMUrOkWuCYsma20vT1RU_KFs0dQOEANLwFtaDe4W5hnn5izl0G9x64lXES26hOQDuicK3DMCkMNS9n-VaEQ3WTDpwVATJRTdvx6hfl4-e_LYStoSupjDouMR7g9O-rVuGa8rrTY-pdyoEN6gwFkQW8wOueU_KTz1hgcF992TxciM6qNri9M1YzwNfUaGqgS-s8hmt_kCO8RqAcYWpYMbxOg",
-    "download_quality":"1080"    
+    "download_quality":"1080",
+    "max_threads":14
 }

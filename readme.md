@@ -1,5 +1,5 @@
 This is just a little project of mine to automaticly download multiple anime episodes from gogoanime (current domain https://anitaku.to).
-I plan on implementing multithreading or something similar, because the server is capped at around 3.3Mbit/s, which is very slow (a 300MB episode takes around 13 Minutes or 2.6s for 1MB).
+Since the download servers have a download limit i added multithreading. One episode downloads at 3.3MBit/s, which means in order to get everything out of your own network you can use multiple threads for multiple episodes (note that the download time for single episodes is not affected by the number of threads). If you have a 50MBit Network (you can test this with almost every speedtest out there) you can calculate the number of threads: 50/3.3 ~ 15
 
 1. Install the requirements: pip install -r requirements.txt
 2. Specify the anime you want to search for

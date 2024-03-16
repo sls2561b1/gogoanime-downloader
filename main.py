@@ -4,8 +4,9 @@ import os
 from bs4 import BeautifulSoup
 import bs4
 import time
-from tqdm import tqdm
 import re
+import threading
+import queue
 
 f = open("setup.json","r")
 setup = json.load(f)
@@ -14,43 +15,62 @@ base_url = setup["gogoanime_main"]
 download_folder = setup["downloads"]
 captcha_v3 = setup["captcha_v3"]
 download_quality = int(setup["download_quality"])
+max_threads = setup["max_threads"]
 
 def download(links,folder):
         if not os.path.exists(folder):
             os.makedirs(folder)
-        for i in links:
-            episode = i["episode"]
-            download = download_link(i["url"])
-            url = download[0]
-            chunk_estimate = download[1]
-            title = download[2]
+        task_queue = queue.Queue()
+        threads = []
+        for i in range(max_threads):
+            t = threading.Thread(target=threaded_download, args=(task_queue,folder))
+            t.start()
+            threads.append(t)
+        for item in links:
+            task_queue.put(item)
+        task_queue.join()
+        for i in range(max_threads):
+            task_queue.put(None)
+        for t in threads:
+            t.join()
 
-            if os.path.exists(f"{folder}/{title}.mp4"):
-                print("file already exists, going to override current data")
-                os.remove(f"{folder}/{title}.mp4")
-            else:
-                open(f"{folder}/{title}.mp4","x").close()
-                print(f"created new file: {title}.mp4")
-            r = requests.get(url,stream=True)
-            print(f"started downloading {title}, episode {episode} to {folder}/{title}.mp4")
+def threaded_download(task_queue,folder):
+    while True:
+        item = task_queue.get()
+        if item is None:
+            break
+        episode = item["episode"]
+        download = download_link(item["url"])
+        url = download[0]
+        title = download[1]
+        file_path = f"{folder}/{title}.mp4"
+        if os.path.exists(file_path):
+            print("file already exists, going to override current data")
+            os.remove(file_path)
+        else:
+            open(file_path, "x").close()
+            print(f"created new file: {title}.mp4")
+        r = requests.get(url, stream=True)
+        print(f"started downloading {title}, episode {episode} to {file_path}")
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=512 * 512):
+                if chunk:
+                    f.write(chunk)
+        if os.path.getsize(file_path) == 0:
+            print(f"something went wrong while downloading {title}, retrying...")
+            task_queue.put(item)
+        else:
+            print(f"finished downloading {title}, episode {episode} to {file_path}")   
+        task_queue.task_done()
 
-            with open(f"{folder}/{title}.mp4", 'wb') as f:
-                with tqdm(total=chunk_estimate, desc="Downloading") as bar:
-                    for chunk in r.iter_content(chunk_size=1024 * 1024):
-                        if chunk:
-                            f.write(chunk)
-                            bar.update(1)
-            print(f"finished downloading {title}, episode {episode} to {folder}/{title}.mp4")
 
 def download_link(link):
     soup = BeautifulSoup(requests.get(link).text,"html.parser")
     base_download_url = BeautifulSoup(str(soup.find("li",{"class":"dowloads"})),"html.parser").a.get("href")                 #typo in the webcode?
     id = base_download_url[base_download_url.find("id=")+3:base_download_url.find("&typesub")]
     base_download_url = base_download_url[:base_download_url.find("id=")]
-    size = BeautifulSoup(requests.post(f"{base_download_url}&id={id}").text,"html.parser")
-    title = clean_filename(size.find("span",{"id":"title"}).text)
-    size = size.find("span",{"id":"filesize"}).text
-    size = int(float(size[:size.find(" ")]).__round__())
+    title = BeautifulSoup(requests.post(f"{base_download_url}&id={id}").text,"html.parser")
+    title = clean_filename(title.find("span",{"id":"title"}).text)
     response = requests.post(f"{base_download_url}&id={id}&captcha_v3={captcha_v3}")                       #will this captcha work for long?
     soup = BeautifulSoup(response.text,"html.parser")
     backup_link = []
@@ -61,10 +81,10 @@ def download_link(link):
             quality = int(quality[2:quality.find("P")])
             if quality == download_quality:
                 print(f"downloading in {quality}p")
-                return [link,int(estimate_chunks(size,quality)),title]
+                return [link,title]
             backup_link = [link,quality]
     print(f"downloading in {backup_link[1]}p")
-    return [backup_link[0],int(estimate_chunks(size,backup_link[1])),title]          #if the prefered download quality is not available the highest quality will automaticly be chosen
+    return [backup_link[0],title]          #if the prefered download quality is not available the highest quality will automaticly be chosen
 
 def clean_filename(filename):
     cleaned_filename = re.sub(r'[\\/*?:"<>|]', '§', filename)
