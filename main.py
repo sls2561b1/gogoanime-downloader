@@ -165,6 +165,7 @@ def create_links(anime):
             "episode": ep,
             "url": f'{base_url}{i.get("href").replace(" ", "")}'
         })
+        
     print(f"{len(episodes)} episodes were found.")
     download_type = input("Select a download type (1. Ranged 2. Selected Only): ")
 
