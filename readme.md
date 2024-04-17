@@ -4,9 +4,11 @@ Since the download servers have a download limit i added multithreading. One epi
 1. Install the requirements: pip install -r requirements.txt
 2. Specify the anime you want to search for
 3. Select one of the found animes
-4. Select which episodes you want to download (only from x to y currently)
-5. Select a foldername that will either be created or used (if you want it somewhere else than the ./downloads you can specify the base path for all downloads in the setup.json file)
-6. Wait 
+4. Select download type (if 1 go to no. 5 else no. 6)
+5. Select which episodes you want to download (only from x to y currently)
+6. Enter the episodes to download (seperated by space)
+7. Select a foldername that will either be created or used (if you want it somewhere else than the ./downloads you can specify the base path for all downloads in the setup.json file)
+8. Wait 
 It apparently can also happen, that an episode is not downloaded correctly, in that case just redownload it.
 
 If the domain name has changed again, change the gogoanime_main in the setup.json file. In case a weird error apears the hardcoded captcha might be outdated, maybe this will get fixed.
